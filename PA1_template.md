@@ -1,15 +1,11 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 
 ## Loading and preprocessing the data
 
-```{r,echo=TRUE}
+
+```r
 activity<-read.csv("./activity.csv")
 activity$date<-as.Date(activity$date,"%Y-%m-%d")
 ```
@@ -18,28 +14,52 @@ activity$date<-as.Date(activity$date,"%Y-%m-%d")
 
 ## What is mean total number of steps taken per day?
 
-```{r,echo=TRUE}
+
+```r
 acsum<-tapply(activity$steps,activity$date,sum,na.rm=TRUE)
 hist(acsum)
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 acmean<-mean(acsum);acmedian<-median(acsum)
 print(acmean)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 print(acmedian)
+```
+
+```
+## [1] 10395
 ```
 
 
 
 ## What is the average daily activity pattern?
 
-```{r,echo=TRUE}
+
+```r
 activity$avesteps<-tapply(activity$steps,activity$interval,mean,na.rm=TRUE)
 library(ggplot2)
 qplot(interval,avesteps,data=activity,geom="line",xlab="interval",ylab="Number of steps")
 ```
 
-```{r inter,echo=TRUE}
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+
+```r
 maxinterval<-activity$interval[which.max(activity$avesteps)]
 maxinterval
+```
+
+```
+## [1] 835
 ```
 
 
@@ -47,20 +67,42 @@ maxinterval
 
 ## Imputing missing values
 
-```{r}
+
+```r
 sum(is.na(activity$steps))
+```
+
+```
+## [1] 2304
 ```
 
 
 filling in all of the missing values by the mean for that 5-minute interval.
-```{r}
+
+```r
 activity2<-activity
 activity2[is.na(activity2$steps)==TRUE,]$steps<-activity2[is.na(activity2$steps)==TRUE,]$avesteps
 acsum2<-tapply(activity2$steps,activity2$date,sum)
 hist(acsum2)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
+```r
 acmean2<-mean(acsum2);acmedian2<-median(acsum2)
 print(acmean2)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 print(acmedian2)
+```
+
+```
+## [1] 10766.19
 ```
 
 
@@ -71,8 +113,16 @@ Filling the missing values makes the bigger mean and median total number of step
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 Sys.setlocale("LC_TIME", "English")
+```
+
+```
+## [1] "English_United States.1252"
+```
+
+```r
 activity2$week<-weekdays(activity2$date)
 activity2[activity2$week=="Saturday",]$week<-c("weekend")
 activity2[activity2$week=="Sunday",]$week<-c("weekend")
@@ -88,8 +138,9 @@ activity2[activity2$week=="weekend",]$avesteps<-tapply(activity2[activity2$week=
 library(lattice)
 activity2<-transform(activity2,week=factor(week))
 xyplot(avesteps~interval|week,data=activity2,layout=c(1,2),type="l",xlab="interval",ylab="Number of steps")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 
 weekend has more steps.
 
